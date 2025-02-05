@@ -19,12 +19,20 @@ lint:
   nextflow_config:
     - manifest.name
     - manifest.homePage
+nf_core_version: 3.2.0
 repository_type: pipeline
 template:
-  prefix: nf
-  skip:
+  author: "@AlexVCaron"
+  description: Human diffusion MRI processing and tractography
+  force: false
+  is_nfcore: false
+  name: tractoflow
+  org: nf
+  outdir: .
+  skip_features:
     - igenomes
     - fastqc
     - seqera_platform
     - adaptivecard
     - slackreport
+  version: 1.0dev
