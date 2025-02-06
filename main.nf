@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf/tractoflow
+    scilus/nf-tractoflow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf/tractoflow
+    Github : https://github.com/scilus/nf-tractoflow
 ----------------------------------------------------------------------------------------
 */
 
@@ -13,9 +13,9 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { TRACTOFLOW  } from './workflows/tractoflow'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_tractoflow_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_tractoflow_pipeline'
+include { NF_TRACTOFLOW  } from './workflows/nf-tractoflow'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nf-tractoflow_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nf-tractoflow_pipeline'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -25,7 +25,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_trac
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow NF_TRACTOFLOW {
+workflow SCILUS_NF_TRACTOFLOW {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -35,11 +35,11 @@ workflow NF_TRACTOFLOW {
     //
     // WORKFLOW: Run pipeline
     //
-    TRACTOFLOW (
+    NF_TRACTOFLOW (
         samplesheet
     )
     emit:
-    multiqc_report = TRACTOFLOW.out.multiqc_report // channel: /path/to/multiqc_report.html
+    multiqc_report = NF_TRACTOFLOW.out.multiqc_report // channel: /path/to/multiqc_report.html
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,7 +64,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    NF_TRACTOFLOW (
+    SCILUS_NF_TRACTOFLOW (
         PIPELINE_INITIALISATION.out.samplesheet
     )
     //
@@ -76,7 +76,7 @@ workflow {
         params.plaintext_email,
         params.output_dir,
         params.monochrome_logs,
-        NF_TRACTOFLOW.out.multiqc_report
+        SCILUS_NF_TRACTOFLOW.out.multiqc_report
     )
 }
 

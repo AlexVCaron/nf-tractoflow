@@ -3,14 +3,11 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_tractoflow_pipeline'
-include { TRACTOFLOW as RUN } from '../subworkflows/nf-neuro/tractoflow'
-include { RECONST_SHSIGNAL } from '../modules/local/reconst/shsignal'
+include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_nf-tractoflow_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -18,7 +15,7 @@ include { RECONST_SHSIGNAL } from '../modules/local/reconst/shsignal'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow TRACTOFLOW {
+workflow NF_TRACTOFLOW {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
@@ -26,62 +23,6 @@ workflow TRACTOFLOW {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
-    ch_topup_config = Channel.empty()
-    ch_bet_template = Channel.empty()
-    ch_bet_probability = Channel.empty()
-
-    /* Load topup config if provided */
-    if ( params.config_topup ) {
-        if ( file(params.config_topup).exists()) {
-            ch_topup_config = Channel.fromPath(params.config_topup, checkIfExists: true)
-        }
-        else {
-            ch_topup_config = Channel.from( params.config_topup )
-        }
-    }
-
-    /* Load bet template */
-    if (params.template_t1) {
-        ch_bet_template = Channel.fromPath("${params.template_t1}/t1_template.nii.gz", checkIfExists: true)
-        ch_bet_probability = Channel.fromPath("${params.template_t1}/t1_brain_probability_map.nii.gz", checkIfExists: true)
-    }
-
-    /* Unpack inputs */
-    ch_inputs = ch_samplesheet
-        .multiMap{ meta, dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg, lesion ->
-            dwi: [meta, dwi, bval, bvec]
-            sbref: [meta, sbref]
-            rev_dwi: [meta, rev_dwi, rev_bval, rev_bvec]
-            rev_sbref: [meta, rev_sbref]
-            t1: [meta, t1]
-            wmparc: [meta, wmparc]
-            aparc_aseg: [meta, aparc_aseg]
-            lesion: [meta, lesion]
-        }
-
-    RUN(
-        ch_inputs.dwi,
-        ch_inputs.t1,
-        ch_inputs.sbref,
-        ch_inputs.rev_dwi,
-        ch_inputs.rev_sbref,
-        ch_inputs.wmparc,
-        ch_inputs.aparc_aseg,
-        ch_topup_config,
-        ch_bet_template,
-        ch_bet_probability,
-        ch_inputs.lesion
-    )
-    ch_versions = ch_versions.mix(RUN.out.versions)
-
-    //
-    // Run RECONST/SH_METRICS
-    //
-    if (params.sh_fitting)
-        RECONST_SHSIGNAL(
-            RUN.out.dwi
-                .join(RUN.out.brain_mask)
-    )
 
     //
     // Collate and save software versions
@@ -89,7 +30,7 @@ workflow TRACTOFLOW {
     softwareVersionsToYAML(ch_versions)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
-            name:  'tractoflow_software_'  + 'mqc_'  + 'versions.yml',
+            name:  'nf-tractoflow_software_'  + 'mqc_'  + 'versions.yml',
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
