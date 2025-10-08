@@ -7,7 +7,7 @@
                 "nf-core": {
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
+                        "git_sha": "e10b76ca0c66213581bec2833e30d31f239dec0b",
                         "installed_by": ["modules"]
                     }
                 }
@@ -122,7 +122,7 @@
                     },
                     "reconst/shsignal": {
                         "branch": "main",
-                        "git_sha": "7e14d496291cdbd3bb44b38e65d563fa14f7478f",
+                        "git_sha": "f9676160a7d9e71ad072c39f32bcc7e7f1621d7a",
                         "installed_by": ["modules"]
                     },
                     "registration/anattodwi": {
