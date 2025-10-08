@@ -45,8 +45,8 @@ jobs:
             NXF_VER: "latest-everything"
         # Exclude conda and singularity on dev
         exclude:
-          - isMaster: false
-            profile: "conda"
+          # - isMaster: false exclude conda profile all the time, as neuroimaging is not on conda
+          - profile: "conda"
           - isMaster: false
             profile: "singularity"
     steps:
